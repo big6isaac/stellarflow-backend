@@ -57,6 +57,8 @@ import { startDekRotationJob } from "./jobs/dekRotationJob";
 import { ledgerEventStreamWorker } from "./services/ledgerEventStreamWorker";
 import { systemicRiskMonitor } from "./services/systemicRiskWiring";
 import { getEventBusService } from "./services/eventBus/eventBusService";
+import { anchorSpreadProfiler } from "./services/remittance/anchorSpreadProfiler";
+import { treasuryGovernanceTimelockAuditExporter } from "./services/governanceTimelockAuditExporter";
 
 // Load environment variables
 dotenv.config();
@@ -393,6 +395,8 @@ systemicRiskMonitor.stop();
     ArbitrageScanner.stop();
     stopConfigWatcher();
     stopEnvFileWatcher?.();
+    anchorSpreadProfiler.stop();
+    treasuryGovernanceTimelockAuditExporter.stop();
     await stopBridgeServices();
 
     marketStreamWss.close();
@@ -804,6 +808,22 @@ httpServer.listen(PORT, async () => {
     );
   } catch (err) {
     console.error("Failed to start event bus monitor:", err);
+  }
+
+  // Issue #1238 – Remittance Anchor Exchange Rate Spread Profiler
+  try {
+    anchorSpreadProfiler.start();
+    console.log("⚖️ Remittance Anchor Rate Spread Profiler started (60s schedule)");
+  } catch (err) {
+    console.error("Failed to start Anchor Spread Profiler:", err);
+  }
+
+  // Issue #1235 – Treasury Governance Timelock Queue Audit Exporter
+  try {
+    treasuryGovernanceTimelockAuditExporter.start();
+    console.log("🏛️ Treasury Governance Timelock Audit Exporter scheduled (daily at 00:00 UTC)");
+  } catch (err) {
+    console.error("Failed to start Treasury Governance Timelock Audit Exporter:", err);
   }
 });
 

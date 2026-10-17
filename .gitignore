@@ -1,6 +1,5 @@
 node_modules/
 dist/
-.env
 .DS_Store
 *.log
 npm-debug.log*
@@ -15,7 +14,6 @@ prisma/migrations/*
 !prisma/migrations/20260929100000_add_sep31_metadata/migration.sql
 docs/
 backups/
-.env
 __pycache__/
 *.py[cod]
 *.pyo
@@ -33,3 +31,10 @@ native/shielded_merkle/target/
 
 # Generated load-test artifacts (k6 summaries, monitor CSVs, reports)
 tests/load/results/
+logs/
+exports/
+
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+config.bat
