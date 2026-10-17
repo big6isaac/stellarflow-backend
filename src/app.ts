@@ -24,7 +24,6 @@ import { jwtMiddleware } from "./middleware/jwtMiddleware";
 
 import adminRouter from "./routes/admin";
 import authRouter from "./routes/auth";
-import oidcRouter from "./routes/oidc";
 import assetsRouter from "./routes/assets";
 import derivedAssetsRouter from "./routes/derivedAssets";
 import historyRouter from "./routes/history";
@@ -60,6 +59,8 @@ import metricsRouter from "./routes/metrics";
 import watchlistRouter from "./routes/watchlist";
 import treasuryRouter from "./routes/treasury";
 import marketStreamRouter from "./routes/marketStream";
+import anchorSpreadRouter from "./routes/anchorSpread.js";
+import timelockRouter from "./routes/timelock.js";
 
 dotenv.config();
 
@@ -163,6 +164,17 @@ app.use(
   adminRateLimitMiddleware,
   eventBusRouter,
 );
+
+// Issue #1235 – Treasury Governance Timelock Queue Audit Exporter
+app.use(
+  "/api/v1/admin/timelocks",
+  adminMiddleware,
+  adminRateLimitMiddleware,
+  timelockRouter,
+);
+
+// Issue #1238 – Remittance Anchor Exchange Rate Spread Profiler
+app.use("/api/v1/anchor-spread", anchorSpreadRouter);
 
 app.use("/api/v1/market-rates", marketRatesRouter);
 app.use("/api/v1/history", historyRouter);
