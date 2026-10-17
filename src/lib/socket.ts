@@ -118,7 +118,7 @@ export function getConnectionMemoryStats() {
     heapUsed,
     rss,
     estimatedBytesPerSocket:
-      activeSockets > 0 ? Math.round((heapUsed - (global as any).__baselineHeap ?? heapUsed)) / activeSockets) : 0,
+      activeSockets > 0 ? Math.round((heapUsed - ((global as any).__baselineHeap ?? heapUsed)) / activeSockets) : 0,
     supports10k: activeSockets === 0 || heapUsed / activeSockets < 50 * 1024,
   };
 }

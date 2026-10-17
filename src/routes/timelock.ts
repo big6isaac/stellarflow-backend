@@ -143,4 +143,71 @@ router.get("/:id", getTimelockById);
  */
 router.post("/:id/cancel", cancelTimelock);
 
+/**
+ * @swagger
+ * /api/v1/admin/timelocks/audit-report/latest:
+ *   get:
+ *     tags:
+ *       - Admin
+ *       - Timelocks
+ *     summary: Export daily Markdown transparency report of queued timelock actions
+ *     description: >
+ *       Reads queued actions in the governance timelock, decodes target contract
+ *       function calls and parameter payloads from raw XDR, generates a Markdown
+ *       transparency report, and exports it to public S3 buckets.
+ *     responses:
+ *       '200':
+ *         description: Transparency report retrieved/generated successfully
+ *       '500':
+ *         description: Exporter error
+ */
+router.get("/audit-report/latest", async (_req, res) => {
+  try {
+    const { treasuryGovernanceTimelockAuditExporter } = await import(
+      "../services/governanceTimelockAuditExporter.js"
+    );
+    const result = await treasuryGovernanceTimelockAuditExporter.exportAuditReport();
+    res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+    res.send(result.markdownContent);
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * @swagger
+ * /api/v1/admin/timelocks/audit-report/export:
+ *   post:
+ *     tags:
+ *       - Admin
+ *       - Timelocks
+ *     summary: Trigger immediate governance timelock queue audit export
+ *     responses:
+ *       '200':
+ *         description: Audit report export completed
+ *       '500':
+ *         description: Exporter error
+ */
+router.post("/audit-report/export", async (_req, res) => {
+  try {
+    const { treasuryGovernanceTimelockAuditExporter } = await import(
+      "../services/governanceTimelockAuditExporter.js"
+    );
+    const result = await treasuryGovernanceTimelockAuditExporter.exportAuditReport();
+    res.json({
+      success: true,
+      reportDate: result.reportDate,
+      queuedActionCount: result.queuedActionCount,
+      executionDurationMs: result.executionDurationMs,
+      meetsExecutionBudget: result.meetsExecutionBudget,
+      s3Bucket: result.s3Bucket,
+      s3Key: result.s3Key,
+      actions: result.actions,
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 export default router;
+

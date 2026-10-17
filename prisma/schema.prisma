@@ -468,6 +468,9 @@ model Relayer {
   registry          RelayerRegistry?
   watchlist         WatchlistItem[]
   notificationPreference UserNotificationPreference?
+  webAuthnCredentials   WebAuthnCredential[]
+  webAuthnChallenges     WebAuthnChallenge[]
+  webAuthnAttestations   WebAuthnAttestation[]
   pushSubscriptions PushSubscription[]
   
   @@index([dekRotationScheduledAt])
@@ -1069,3 +1072,29 @@ model KycCustomer {
   @@index([status, createdAt])
   @@index([account])
 }
+
+// Issue #1238 – Remittance Anchor Exchange Rate Spread Profiler
+// Records historical exchange rates and spread percentages for registered SEP-38 payout anchors
+// relative to global mid-market FX benchmark rates, stored in TimescaleDB for partner evaluation.
+model AnchorSpreadMetric {
+  id               String   @id @default(uuid())
+  timestamp        DateTime @default(now()) @db.Timestamptz(3)
+  anchorId         String   @db.VarChar(100)
+  anchorName       String   @db.VarChar(100)
+  sellAsset        String   @db.VarChar(100)
+  buyAsset         String   @db.VarChar(100)
+  anchorPrice      Decimal  @db.Decimal(24, 8)
+  anchorRate       Decimal  @db.Decimal(24, 8)
+  benchmarkRate    Decimal  @db.Decimal(24, 8)
+  spreadPercentage Decimal  @db.Decimal(8, 4)
+  isAnomaly        Boolean  @default(false)
+  anomalyReason    String?  @db.VarChar(255)
+  latencyMs        Int      @default(0)
+  status           String   @default("SUCCESS") @db.VarChar(30)
+
+  @@index([timestamp(sort: Desc)])
+  @@index([anchorId, timestamp(sort: Desc)])
+  @@index([sellAsset, buyAsset, timestamp(sort: Desc)])
+  @@index([isAnomaly, timestamp(sort: Desc)])
+}
+
