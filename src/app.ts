@@ -61,6 +61,7 @@ import treasuryRouter from "./routes/treasury";
 import marketStreamRouter from "./routes/marketStream";
 import anchorSpreadRouter from "./routes/anchorSpread.js";
 import timelockRouter from "./routes/timelock.js";
+import sep38Router from "./routes/sep38";
 
 dotenv.config();
 
@@ -205,6 +206,10 @@ app.use("/api/v1/treasury", treasuryRouter);
 
 // Issue #815 – Remittance transaction history endpoint
 app.use("/api/v1/remittance", remittanceRouter);
+
+// Issue #1276 – SEP-38 exchange rate quote server (quotes, info, prices and
+// the client auto-refresh endpoint).
+app.use("/api/v1/remittance/sep38", sep38Router);
 
 // Issue #990 – SEP-12 customer information transfer (KYC) endpoints
 app.use("/api/v1/kyc", kycRouter);
