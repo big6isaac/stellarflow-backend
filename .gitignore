@@ -1,6 +1,5 @@
 node_modules/
 dist/
-.env
 .DS_Store
 *.log
 npm-debug.log*
@@ -15,7 +14,6 @@ prisma/migrations/*
 !prisma/migrations/20260929100000_add_sep31_metadata/migration.sql
 docs/
 backups/
-.env
 __pycache__/
 *.py[cod]
 *.pyo
@@ -36,3 +34,4 @@ tests/load/results/
 logs/
 exports/
 
+config.bat
