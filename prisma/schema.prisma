@@ -1098,3 +1098,29 @@ model AnchorSpreadMetric {
   @@index([isAnomaly, timestamp(sort: Desc)])
 }
 
+// Issue #1276 – SEP-38 Exchange Rate Quote Expiration & Refresh Engine
+// Durable record of every SEP-38 quote issued by the remittance quote server.
+// The Redis key `quote:sep38:<id>` mirrors an ACTIVE row here and carries the
+// same TTL; the Sep38QuoteExpiryWorker reconciles expired quotes back into this
+// table as EXPIRED so the lifecycle is never lost when the Redis key is evicted.
+model Sep38Quote {
+  id               String   @id
+  sellAsset        String   @db.VarChar(128)
+  sellAmount       Decimal  @db.Decimal(30, 12)
+  buyAsset         String   @db.VarChar(128)
+  buyAmount        Decimal  @db.Decimal(30, 12)
+  price            Decimal  @db.Decimal(30, 12)
+  totalPrice       Decimal  @db.Decimal(30, 12)
+  fee              Json?
+  status           String   @default("ACTIVE") @db.VarChar(20)
+  expiresAt        DateTime
+  refreshedFromId  String?
+  refreshedAt      DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([status, expiresAt])
+  @@index([status])
+  @@index([refreshedFromId])
+}
+
