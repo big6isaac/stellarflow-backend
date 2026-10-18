@@ -58,6 +58,7 @@ import { ledgerEventStreamWorker } from "./services/ledgerEventStreamWorker";
 import { systemicRiskMonitor } from "./services/systemicRiskWiring";
 import { getEventBusService } from "./services/eventBus/eventBusService";
 import { anchorSpreadProfiler } from "./services/remittance/anchorSpreadProfiler";
+import { getSep38QuoteExpiryWorker } from "./services/remittance/sep38QuoteExpiryWorker";
 import { treasuryGovernanceTimelockAuditExporter } from "./services/governanceTimelockAuditExporter";
 
 // Load environment variables
@@ -396,6 +397,7 @@ systemicRiskMonitor.stop();
     stopConfigWatcher();
     stopEnvFileWatcher?.();
     anchorSpreadProfiler.stop();
+    getSep38QuoteExpiryWorker().stop();
     treasuryGovernanceTimelockAuditExporter.stop();
     await stopBridgeServices();
 
@@ -816,6 +818,14 @@ httpServer.listen(PORT, async () => {
     console.log("⚖️ Remittance Anchor Rate Spread Profiler started (60s schedule)");
   } catch (err) {
     console.error("Failed to start Anchor Spread Profiler:", err);
+  }
+
+  // Issue #1276 – SEP-38 Exchange Rate Quote Expiration & Refresh Engine
+  try {
+    getSep38QuoteExpiryWorker().start();
+    console.log("⏱️ SEP-38 quote expiry worker started (1s sweep)");
+  } catch (err) {
+    console.error("Failed to start SEP-38 quote expiry worker:", err);
   }
 
   // Issue #1235 – Treasury Governance Timelock Queue Audit Exporter
