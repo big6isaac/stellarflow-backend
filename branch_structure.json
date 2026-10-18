@@ -1,0 +1,21 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "feat/issue-1276-implement-sep-38-exchange-rate-quote-expiration",
+    "feat/sep38-quote-expiration-refresh",
+    "main",
+    "origin"
+  ],
+  "parent": {
+    "feat/issue-1276-implement-sep-38-exchange-rate-quote-expiration": "main",
+    "feat/sep38-quote-expiration-refresh": "main",
+    "main": null,
+    "origin": "main"
+  },
+  "order": [
+    "main",
+    "feat/issue-1276-implement-sep-38-exchange-rate-quote-expiration",
+    "feat/sep38-quote-expiration-refresh",
+    "origin"
+  ]
+}
